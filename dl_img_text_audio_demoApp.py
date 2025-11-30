@@ -34,7 +34,7 @@ if uploaded_file is not None:
         with st.spinner("Creating story..."):
             img_pipe = pipeline("image-to-text", model="Salesforce/blip-image-captioning-base")
             imgDsp = img_pipe(image)
-
+            st.write(imgDsp)
             # Base caption from BLIP
             text_generator = pipeline("text-generation")
             output = text_generator(imgDsp[0]['generated_text'], max_length=100, num_return_sequences=1)
