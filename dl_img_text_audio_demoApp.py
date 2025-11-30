@@ -1,7 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 from PIL import Image
-from IPython.display import Audio
+from display import Audio
 import tempfile
 
 # -----------------------------
