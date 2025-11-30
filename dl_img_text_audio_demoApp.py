@@ -1,4 +1,4 @@
-import streamlit as st
+[]import streamlit as st
 from transformers import pipeline
 from PIL import Image
 
@@ -38,10 +38,10 @@ if uploaded_file is not None:
              # Expand into a story
             text_generator = pipeline("text-generation")
             output = text_generator(imgDsp[0]['generated_text'], max_length=100, num_return_sequences=1)
-            st.write(output)
+            
             # Format
             story = (
-                f"Once upon a time, {output.lower()}, "
+                f"Once upon a time, {output[0]['generated_text'].lower()}, "
                 "and what happened next transformed the world around it..."
             )
 
