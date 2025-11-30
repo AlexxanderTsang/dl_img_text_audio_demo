@@ -1,26 +1,55 @@
-# --- Import ---
-import requests
+import streamlit as st
+from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
-from google.colab import files
-# Use a pipeline as a high-level helper
-from transformers import pipeline
-from IPython.display import Audio
 
-# --- Step 1: Upload image ---
-uploaded = files.upload()
-image_path = list(uploaded.keys())[0]
+# -----------------------------
+# Load transformer model locally
+# -----------------------------
+@st.cache_resource
+def load_model():
+    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
+    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
+    return processor, model
 
-# Display image to verify
-img = Image.open(image_path)
+processor, model = load_model()
 
-img_pipe = pipeline("image-to-text", model="Salesforce/blip-image-captioning-base")
-imgDsp = img_pipe(img)
+st.title("📘 Image → Story Generator (Local Transformer Model)")
 
-# Create a text generation pipeline object
-text_generator = pipeline("text-generation")
-output = text_generator(imgDsp[0]['generated_text'], max_length=100, num_return_sequences=1)
+# -----------------------------
+# UI: click button to choose file
+# -----------------------------
+uploaded_file = None
 
-pipe = pipeline("text-to-speech", model="facebook/mms-tts-eng")
-output_speech = pipe(output[0]['generated_text'])
+if st.button("📁 Select an Image"):
+    uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
-Audio(output_speech['audio'],rate=output_speech['sampling_rate'])
+# If user uploads normally without button (allowed)
+if not uploaded_file:
+    uploaded_file = st.file_uploader("Or upload directly:", type=["jpg", "jpeg", "png"])
+
+# -----------------------------
+# Once file is selected → display it
+# -----------------------------
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Selected Image", use_column_width=True)
+
+    # -----------------------------
+    # Generate story
+    # -----------------------------
+    if st.button("Generate Story"):
+        with st.spinner("Creating story..."):
+            inputs = processor(image, return_tensors="pt")
+
+            # Base caption from BLIP
+            caption_ids = model.generate(**inputs, max_length=50)
+            caption = processor.decode(caption_ids[0], skip_special_tokens=True)
+
+            # Expand into a story
+            story = (
+                f"Once upon a time, {caption.lower()}, "
+                "and what happened next transformed the world around it..."
+            )
+
+        st.subheader("📖 Story")
+        st.write(story)
