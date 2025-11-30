@@ -54,11 +54,16 @@ if uploaded_file is not None:
         st.write(story)
 
 if st.button("🔊 Convert Story to Audio"):
-    try:
-        tts = gTTS(text=story, lang="en")
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-            tts.save(tmp.name)
-            st.audio(tmp.name, format="audio/mp3")
-    except Exception as e:
-        st.error(f"Audio generation failed: {e}")
+    # Check if story exists
+    if "story" not in st.session_state or not st.session_state["story"]:
+        st.error("Please generate a story before converting to audio.")
+    else:
+        story = st.session_state["story"]
+        try:
+            tts = gTTS(text=story, lang="en")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                tts.save(tmp.name)
+                st.audio(tmp.name, format="audio/mp3")
+        except Exception as e:
+            st.error(f"Audio generation failed: {e}")
 
