@@ -49,7 +49,9 @@ if uploaded_file is not None:
                 f"Once upon a time, {output[0]['generated_text'].lower()}, "
                 "and what happened next transformed the world around it..."
             )
-
+            # Save story to session_state
+            st.session_state["story"] = story
+            
         st.subheader("📖 Story")
         st.write(story)
 
