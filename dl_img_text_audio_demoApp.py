@@ -2,6 +2,7 @@ import streamlit as st
 from transformers import pipeline
 from PIL import Image
 import tempfile
+from gtts import gTTS
 
 # -----------------------------
 # Load transformer model locally
