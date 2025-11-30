@@ -2,4 +2,4 @@ transformers
 torch
 streamlit
 gtts
-IPython.display
+display
