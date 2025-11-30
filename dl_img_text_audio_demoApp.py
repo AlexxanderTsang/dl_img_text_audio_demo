@@ -1,7 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 from PIL import Image
-from gtts import gTTS
+from IPython.display import Audio
 import tempfile
 
 # -----------------------------
@@ -51,9 +51,8 @@ if uploaded_file is not None:
         st.write(story)
 
 if st.button("🔊 Convert Story to Audio"):
-    tts = gTTS(output[0]['generated_text'], lang="en")
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-        tts.save(tmp.name)
-        audio_path = tmp.name
+    pipe = pipeline("text-to-speech", model="facebook/mms-tts-eng")
+    output_speech = pipe(output[0]['generated_text'])
 
-    st.audio(audio_path, format="audio/mp3")
+    Audio(output_speech['audio'],rate=output_speech['sampling_rate'])
+
