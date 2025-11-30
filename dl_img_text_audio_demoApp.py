@@ -1,17 +1,10 @@
 import streamlit as st
-from transformers import BlipProcessor, BlipForConditionalGeneration
+from transformers import pipeline
 from PIL import Image
 
 # -----------------------------
 # Load transformer model locally
 # -----------------------------
-@st.cache_resource
-def load_model():
-    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
-    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
-    return processor, model
-
-processor, model = load_model()
 
 st.title("📘 Image → Story Generator (Local Transformer Model)")
 
@@ -39,15 +32,16 @@ if uploaded_file is not None:
     # -----------------------------
     if st.button("Generate Story"):
         with st.spinner("Creating story..."):
-            inputs = processor(image, return_tensors="pt")
+            img_pipe = pipeline("image-to-text", model="Salesforce/blip-image-captioning-base")
+            imgDsp = img_pipe(image)
 
             # Base caption from BLIP
-            caption_ids = model.generate(**inputs, max_length=50)
-            caption = processor.decode(caption_ids[0], skip_special_tokens=True)
+            text_generator = pipeline("text-generation")
+            output = text_generator(imgDsp[0]['generated_text'], max_length=100, num_return_sequences=1)
 
             # Expand into a story
             story = (
-                f"Once upon a time, {caption.lower()}, "
+                f"Once upon a time, {output.lower()}, "
                 "and what happened next transformed the world around it..."
             )
 
