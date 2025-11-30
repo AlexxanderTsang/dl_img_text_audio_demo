@@ -1,6 +1,7 @@
-[]import streamlit as st
+import streamlit as st
 from transformers import pipeline
 from PIL import Image
+from IPython.display import Audio
 
 # -----------------------------
 # Load transformer model locally
@@ -47,3 +48,9 @@ if uploaded_file is not None:
 
         st.subheader("📖 Story")
         st.write(story)
+
+st.subheader("Story Audio")
+pipe = pipeline("text-to-speech", model="facebook/mms-tts-eng")
+output_speech = pipe(output[0]['generated_text'])
+
+Audio(output_speech['audio'],rate=output_speech['sampling_rate'])
