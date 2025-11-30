@@ -34,12 +34,12 @@ if uploaded_file is not None:
         with st.spinner("Creating story..."):
             img_pipe = pipeline("image-to-text", model="Salesforce/blip-image-captioning-base")
             imgDsp = img_pipe(image)
-            st.write(imgDsp)
-            # Base caption from BLIP
+
+             # Expand into a story
             text_generator = pipeline("text-generation")
             output = text_generator(imgDsp[0]['generated_text'], max_length=100, num_return_sequences=1)
-
-            # Expand into a story
+            st.write(output)
+            # Format
             story = (
                 f"Once upon a time, {output.lower()}, "
                 "and what happened next transformed the world around it..."
