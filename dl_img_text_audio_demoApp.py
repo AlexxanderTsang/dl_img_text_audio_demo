@@ -25,6 +25,9 @@ if not uploaded_file:
 # -----------------------------
 # Once file is selected → display it
 # -----------------------------
+
+story = None
+
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Selected Image", use_column_width=True)
